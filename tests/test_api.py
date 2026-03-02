@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -14,7 +15,6 @@ from src.detection.detector import DetectionResult, YOLODetector
 @pytest.fixture()
 def client():
     """Create a test client with mocked detector and agent."""
-    # Patch the global singletons before importing the app
     import src.api.main as api_mod
 
     mock_detector = MagicMock(spec=YOLODetector)
@@ -32,14 +32,22 @@ def client():
         "zones": [],
     }
 
-    api_mod._detector = mock_detector
-    api_mod._agent = mock_agent
+    # Inject mocks via the lifespan so the TestClient doesn't create real instances
+    @asynccontextmanager
+    async def _test_lifespan(app):
+        api_mod._detector = mock_detector
+        api_mod._agent = mock_agent
+        yield
+        api_mod._detector = None
+        api_mod._agent = None
+
+    original_lifespan = api_mod.app.router.lifespan_context
+    api_mod.app.router.lifespan_context = _test_lifespan
 
     with TestClient(api_mod.app, raise_server_exceptions=False) as tc:
         yield tc
 
-    api_mod._detector = None
-    api_mod._agent = None
+    api_mod.app.router.lifespan_context = original_lifespan
 
 
 class TestHealthEndpoint:
