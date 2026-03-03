@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yolo-vision-agent"
+version = "1.0.0"
+description = "AI Agent powered by YOLOv11-L for real-time object detection"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "YOLO Vision Agent Team"},
+]
+
+[project.scripts]
+yolo-agent-api = "src.api.main:run"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

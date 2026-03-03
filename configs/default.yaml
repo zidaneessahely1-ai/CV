@@ -1,0 +1,42 @@
+# YOLOv11-L Vision Agent Configuration
+
+model:
+  name: "yolo11l"               # YOLOv11 Large variant
+  weights: "yolo11l.pt"         # Auto-downloads from Ultralytics hub
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+  max_detections: 300
+  device: "auto"                # "auto", "cpu", "cuda", "mps"
+  half_precision: false         # FP16 inference (GPU only)
+  image_size: 640
+
+agent:
+  name: "VisionAgent"
+  decision_interval: 1.0        # Seconds between agent decisions
+  alert_classes:                 # Classes that trigger alerts
+    - "person"
+    - "car"
+    - "truck"
+    - "fire hydrant"
+  counting_classes:              # Classes to count
+    - "person"
+    - "car"
+    - "bicycle"
+  zone_monitoring: true          # Enable region-of-interest monitoring
+  max_history: 1000              # Max detection records in memory
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "*"
+  max_upload_size_mb: 50
+
+dashboard:
+  host: "0.0.0.0"
+  port: 8501
+
+paths:
+  uploads: "data/uploads"
+  outputs: "data/outputs"
+  logs: "logs"
